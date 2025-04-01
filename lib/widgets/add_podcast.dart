@@ -11,18 +11,18 @@ class AddPodcastScreen extends StatefulWidget {
 }
 
 class _AddPodcastScreenState extends State<AddPodcastScreen> {
-  final TextEditingController _titleController = TextEditingController();
+  //final TextEditingController _titleController = TextEditingController();
   final TextEditingController _feedUrlController = TextEditingController();
 
   void _addPodcast() async {
-    if (_titleController.text.isEmpty || _feedUrlController.text.isEmpty) {
+    if (_feedUrlController.text.isEmpty && !_feedUrlController.text.contains('http')) {
       _dialogBuilder(context);
       return;
     }
     final dbService = DBService();
     final podcast = Podcast(
       id: null, // Auto-increment
-      title: _titleController.text,
+      title: '', //_titleController.text,
       feedUrl: _feedUrlController.text,
     );
     final insertedPodcast = await dbService.addPodcast(podcast);
@@ -32,17 +32,17 @@ class _AddPodcastScreenState extends State<AddPodcastScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Podcast'),
-      ),
+      appBar: AppBar(title: Text('Add Podcast')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            /*
             TextField(
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Title'),
             ),
+             */
             SizedBox(height: 20),
             TextField(
               controller: _feedUrlController,
