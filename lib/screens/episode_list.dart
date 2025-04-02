@@ -1,4 +1,3 @@
-// episode_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:podsink/models/episode.dart';
 import 'package:podsink/models/podcast.dart';
@@ -7,7 +6,7 @@ import 'package:podsink/services/db_service.dart';
 class EpisodeListScreen extends StatefulWidget {
   final Podcast podcast;
 
-  EpisodeListScreen({required this.podcast});
+  const EpisodeListScreen({super.key, required this.podcast});
 
   @override
   _EpisodeListScreenState createState() => _EpisodeListScreenState();

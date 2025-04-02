@@ -40,12 +40,18 @@ dependencies:
   permission_handler: ^11.4.0 # Ensure you're using the latest version
   confirm_dialog: ^1.0.4
   build_runner:
-
+  version:
+  new_version_plus:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   cached_network_image: ^3.4.1
   shared_preferences: ^2.5.3
+  #in_app_update: ^4.2.3
+  package_info_plus: ^8.3.0
+  audio_service: ^0.18.17
+  just_audio: ^0.9.46
+  just_audio_background:
 
 dev_dependencies:
   flutter_test:

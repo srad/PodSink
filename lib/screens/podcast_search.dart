@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:podsink/widgets/episodes_search_screen.dart';
+import 'package:podsink/screens/episodes_search.dart';
 
 class PodcastSearchScreen extends StatefulWidget {
+  const PodcastSearchScreen({super.key});
+
   @override
   _PodcastSearchScreenState createState() => _PodcastSearchScreenState();
 }

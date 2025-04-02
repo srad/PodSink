@@ -8,6 +8,16 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  ListTile _tile(String label, String path, IconData icon) {
+    return ListTile(
+      title: Text(label),
+      leading: Icon(icon),
+      onTap: () {
+        Navigator.pushNamed(context, path);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -22,20 +32,9 @@ class _AppDrawerState extends State<AppDrawer> {
             decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             child: Text('PodSink', style: TextStyle(fontSize: 26)),
           ),
-          ListTile(
-            title: const Text('Podcasts'),
-            leading: Icon(Icons.podcasts),
-            onTap: () {
-              Navigator.pushNamed(context, '/');
-            },
-          ),
-          ListTile(
-            title: const Text('Settings'),
-            leading: Icon(Icons.settings),
-            onTap: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-          ),
+          _tile('Podcasts', '/', Icons.podcasts),
+          _tile('Settings', '/settings', Icons.settings),
+          _tile('About', '/about', Icons.info),
         ],
       ),
     );
