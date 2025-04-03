@@ -1,7 +1,9 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:podsink/utils/podcast_feed_parser.dart';
 import 'package:podsink/widgets/simple_audio_player.dart';
+import 'package:provider/provider.dart';
 
 class EpisodesSearchScreen extends StatefulWidget {
   final String rssFeedUrl;
@@ -24,8 +26,12 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
   }
 
   Card _info(FeedPodcast podcast) {
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme
+        .of(context)
+        .textTheme;
+    final colorScheme = Theme
+        .of(context)
+        .colorScheme;
 
     return Card(
       elevation: 2.0,
@@ -76,9 +82,9 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
                 ),
               ],
             ),
-            if (_selectedEpisode != null) Divider(),
-            if (_selectedEpisode != null)
-              if (_selectedEpisode != null) SimpleAudioPlayer(url: _selectedEpisode!.mediaUrl),
+            // if (_selectedEpisode != null) Divider(),
+            // if (_selectedEpisode != null)
+            //   if (_selectedEpisode != null) SimpleAudioPlayer(url: _selectedEpisode!.mediaUrl),
           ],
         ),
       ),
@@ -115,18 +121,24 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
                     return ListTile(
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(6.0), // Rounded corners for the image
-                        child: CachedNetworkImage(placeholder: (context, url) => const SizedBox(width: 50, height: 50, child: Center(child: CircularProgressIndicator())), errorWidget: (context, url, error) => const Icon(Icons.broken_image_outlined, size: 50), imageUrl: episode.imageUrl ?? podcast.imageUrl, width: 50, height: 50, fit: BoxFit.cover),
+                        child: CachedNetworkImage(placeholder: (context, url) => const SizedBox(width: 50, height: 50, child: Center(child: CircularProgressIndicator())),
+                            errorWidget: (context, url, error) => const Icon(Icons.broken_image_outlined, size: 50),
+                            imageUrl: episode.imageUrl ?? podcast.imageUrl,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover),
                       ),
                       title: Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
                       subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(episode.pubDate, style: TextStyle(color: Colors.grey.shade600)),
-                              Text(episode.duration??"-")
+                            Text(episode.duration ?? "-")
                           ]),
                       onTap: () async {
                         setState(() {
                           _selectedEpisode = episode;
+                          _loadMedia(context, episode);
                         });
                         //Navigator.pushNamed(context, '/player', arguments: episode);
                       },
@@ -173,5 +185,30 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
         ),
       ),
     );
+  }
+
+  bool _isHandlerLoaded = false;
+
+  Future<void> _loadMedia(BuildContext context, FeedEpisode episode) async {
+    final audioHandler = context.read<AudioHandler>();
+
+    if (_isHandlerLoaded && audioHandler.mediaItem.value?.id == episode.mediaUrl) {
+      return;
+    }
+
+    final mediaItem = MediaItem(
+        id: episode.mediaUrl,
+        title: audioHandler.mediaItem.value?.title ?? "No title",
+        duration: audioHandler.mediaItem.value?.duration,
+        artUri: audioHandler.mediaItem.value?.artUri
+    );
+
+    await audioHandler.playMediaItem(mediaItem);
+
+    if (mounted) {
+      setState(() {
+        _isHandlerLoaded = true;
+      });
+    }
   }
 }

@@ -10,7 +10,16 @@ Future<AudioHandler> initAudioService() async {
     return _audioHandler!;
   }
 
-  _audioHandler = await AudioService.init(builder: () => MyAudioHandler(), config: const AudioServiceConfig(androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio', androidNotificationChannelName: 'Audio playback', androidNotificationOngoing: true));
+  _audioHandler = await AudioService.init(
+      builder: () => MyAudioHandler(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+        androidNotificationChannelName: 'Audio playback',
+        androidNotificationOngoing: true,
+        fastForwardInterval: Duration(seconds: 30),
+        rewindInterval: Duration(seconds: 30),
+      )
+  );
 
   return _audioHandler!;
 }
