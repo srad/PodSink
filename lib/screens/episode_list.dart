@@ -7,7 +7,7 @@ import 'package:podsink/services/db_service.dart';
 class EpisodeListScreen extends StatefulWidget {
   final Podcast podcast;
 
-  EpisodeListScreen({required this.podcast});
+  const EpisodeListScreen({super.key, required this.podcast});
 
   @override
   _EpisodeListScreenState createState() => _EpisodeListScreenState();
