@@ -5,10 +5,10 @@ import 'package:podsink/widgets/volume_control.dart';
 import 'package:provider/provider.dart';
 
 class SimpleAudioPlayer extends StatefulWidget {
-  final String url;
+  String? url;
   final bool playAutomatically;
 
-  const SimpleAudioPlayer({super.key, required this.url, this.playAutomatically = true});
+  SimpleAudioPlayer({super.key, this.url, this.playAutomatically = true});
 
   @override
   State<SimpleAudioPlayer> createState() => _SimpleAudioPlayerState();
@@ -20,7 +20,11 @@ class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
   @override
   void initState() {
     super.initState();
-    _loadMedia();
+    if (widget.url != null) {
+      _loadMedia(widget.url!);
+    } else {
+      _isHandlerLoaded = true;
+    }
   }
 
   @override
@@ -28,23 +32,18 @@ class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
     super.didUpdateWidget(oldWidget);
     if (widget.url != oldWidget.url) {
       _isHandlerLoaded = false;
-      _loadMedia();
+      _loadMedia(widget.url!);
     }
   }
 
-  Future<void> _loadMedia() async {
+  Future<void> _loadMedia(String url) async {
     final audioHandler = context.read<AudioHandler>();
 
     if (_isHandlerLoaded && audioHandler.mediaItem.value?.id == widget.url) {
       return;
     }
 
-    final mediaItem = MediaItem(
-      id: widget.url,
-      title: audioHandler.mediaItem.value?.title ?? "No title",
-      duration: audioHandler.mediaItem.value?.duration,
-      artUri: audioHandler.mediaItem.value?.artUri
-    );
+    final mediaItem = MediaItem(id: url, title: audioHandler.mediaItem.value?.title ?? "No title", duration: audioHandler.mediaItem.value?.duration, artUri: audioHandler.mediaItem.value?.artUri);
 
     if (widget.playAutomatically) {
       await audioHandler.playMediaItem(mediaItem);

@@ -1,6 +1,7 @@
 // main.dart
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:podsink/models/episode.dart';
 import 'package:podsink/models/podcast.dart';
 import 'package:podsink/my_audio_handler.dart';
@@ -46,11 +47,6 @@ class _PodSink extends State<PodSink> {
   final darkTheme = ThemeData(brightness: Brightness.dark, primaryColor: Colors.indigo, appBarTheme: AppBarTheme(backgroundColor: Colors.deepPurpleAccent, foregroundColor: Colors.white));
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final audioHandler = context.read<AudioHandler>();
@@ -84,7 +80,6 @@ class _PodSink extends State<PodSink> {
           builder: (context, snapshot) {
             final playbackState = snapshot.data;
             final isPlaying = playbackState?.playing ?? false;
-
 
             return Stack(
               children: [
