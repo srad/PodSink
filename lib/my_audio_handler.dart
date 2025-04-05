@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -10,16 +12,7 @@ Future<AudioHandler> initAudioService() async {
     return _audioHandler!;
   }
 
-  _audioHandler = await AudioService.init(
-      builder: () => MyAudioHandler(),
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-        androidNotificationChannelName: 'Audio playback',
-        androidNotificationOngoing: true,
-        fastForwardInterval: Duration(seconds: 30),
-        rewindInterval: Duration(seconds: 30),
-      )
-  );
+  _audioHandler = await AudioService.init(builder: () => MyAudioHandler(), config: const AudioServiceConfig(androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio', androidNotificationChannelName: 'Audio playback', androidNotificationOngoing: true, fastForwardInterval: Duration(seconds: 30), rewindInterval: Duration(seconds: 30)));
 
   return _audioHandler!;
 }
@@ -90,6 +83,16 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> seek(Duration position) async {
     _player.seek(position);
+  }
+
+  @override
+  Future<void> seekBackward(bool begin) {
+    return _player.seek(Duration(seconds: max(0, _player.position.inSeconds - 30)));
+  }
+
+  @override
+  Future<void> seekForward(bool begin) {
+    return _player.seek(Duration(seconds: _player.position.inSeconds + 30));
   }
 
   @override

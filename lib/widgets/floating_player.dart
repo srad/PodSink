@@ -12,15 +12,28 @@ class FloatingAudioPlayer extends StatelessWidget {
       bottom: 48.0,
       right: 16.0,
       left: 16.0,
-      height: 140,
+      height: 70,
       child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.7),
-            borderRadius: BorderRadius.circular(8),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF5E5A5A), // Light grey (top)
+              Color(0xFF302E2E), // Slightly darker grey (bottom)
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          child: AudioControls()
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(120), // Subtle shadow
+              blurRadius: 4,
+              offset: Offset(0, 4), // Floating effect, shadow below
+            ),
+          ],
         ),
+        child: Padding(padding: EdgeInsets.all(4), child: AudioControls(slider: false)),
+      ),
     );
   }
 }

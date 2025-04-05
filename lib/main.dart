@@ -1,6 +1,7 @@
 // main.dart
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:podsink/models/episode.dart';
 import 'package:podsink/models/podcast.dart';
 import 'package:podsink/my_audio_handler.dart';

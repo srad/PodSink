@@ -9,15 +9,16 @@ import 'package:tuple/tuple.dart';
 class AudioControls extends StatefulWidget {
   String? url;
   final bool playAutomatically;
+  final bool slider;
 
-  AudioControls({super.key, this.url, this.playAutomatically = true});
+  AudioControls({super.key, this.url, this.playAutomatically = true, this.slider = true});
 
   @override
   State<AudioControls> createState() => _AudioControlsState();
 }
 
 class _AudioControlsState extends State<AudioControls> {
-  final Color _accentColor = Colors.amber;
+  final Color _accentColor = Colors.white70;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,7 @@ class _AudioControlsState extends State<AudioControls> {
   }
 
   Widget _buildIconButton(BuildContext context, AudioProcessingState processingState, IconData icon, VoidCallback? onPressed) {
-    return IconButton(icon: Icon(icon, color: _accentColor), padding: const EdgeInsets.fromLTRB(0, 0, 16, 0), iconSize: 48.0, color: Theme.of(context).primaryColor, onPressed: onPressed);
+    return IconButton(icon: Icon(icon, color: _accentColor), iconSize: 38.0, color: Theme.of(context).primaryColor, onPressed: onPressed);
   }
 
   @override
@@ -69,7 +70,7 @@ class _AudioControlsState extends State<AudioControls> {
   }
 
   _buildControls(BuildContext context, PlaybackState playbackState, MediaItem? mediaItem) {
-    final fontStyle = TextStyle(fontSize: 14, color: _accentColor, decoration: TextDecoration.none);
+    final fontStyle = TextStyle(fontSize: 18, color: _accentColor, decoration: TextDecoration.none);
     final isPlaying = playbackState?.playing ?? false;
     final duration = mediaItem?.duration ?? Duration.zero;
     final position = playbackState?.updatePosition ?? Duration.zero;
@@ -82,43 +83,40 @@ class _AudioControlsState extends State<AudioControls> {
     } else {
       return Column(
         children: [
-          Expanded(
-              child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(alignment: Alignment.centerLeft, child: Text("${durationToHHMMSS(position)}/${durationToHHMMSS(duration)}", style: fontStyle)),
-              Align(alignment: Alignment.centerRight, child: Icon(Icons.close, color: Colors.red))
-          ])),
-          Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: Slider(
-                activeColor: _accentColor,
-                //activeColor: Theme.of(context).primaryColor,
-                value: position.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
-                min: 0,
-                max: duration.inSeconds.toDouble(),
-                secondaryTrackValue: buffered.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
-                onChanged: (value) {
-                  // Seek functionality
-                  if (duration > Duration.zero && playbackState.processingState != AudioProcessingState.buffering) {
-                    audioHandler.seek(Duration(seconds: value.round()));
-                  }
-                },
+          if (widget.slider)
+            Expanded(
+              child: Material(
+                color: Colors.transparent,
+                child: Slider(
+                  activeColor: _accentColor,
+                  //activeColor: Theme.of(context).primaryColor,
+                  value: position.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
+                  min: 0,
+                  max: duration.inSeconds.toDouble(),
+                  secondaryTrackValue: buffered.inSeconds.toDouble().clamp(0.0, duration.inSeconds.toDouble()),
+                  onChanged: (value) {
+                    // Seek functionality
+                    if (duration > Duration.zero && playbackState.processingState != AudioProcessingState.buffering) {
+                      audioHandler.seek(Duration(seconds: value.round()));
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-          Divider(),
           Row(
             children: [
               Expanded(flex: 1, child: _buildPlayPauseButton(context, playbackState.processingState, isPlaying)),
+              Expanded(flex: 2, child: Column(children: [Text("${durationToHHMMSS(position)}", style: fontStyle), Text("${durationToHHMMSS(duration)}", style: fontStyle)])),
               Row(
                 children: [
-                  _buildIconButton(context, playbackState.processingState, Icons.replay_30, () {
-                    audioHandler.seekBackward(false);
+                  _buildIconButton(context, playbackState.processingState, Icons.replay_30, () async {
+                    await audioHandler.seekBackward(false);
                   }),
-                  _buildIconButton(context, playbackState.processingState, Icons.forward_30, () {
-                    audioHandler.fastForward();
+                  _buildIconButton(context, playbackState.processingState, Icons.forward_30, () async {
+                    await audioHandler.seekForward(false);
+                  }),
+                  _buildIconButton(context, playbackState.processingState, Icons.close, () async {
+                    await audioHandler.stop();
                   }),
                 ],
               ),
