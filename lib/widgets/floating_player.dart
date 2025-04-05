@@ -23,11 +23,11 @@ class FloatingAudioPlayer extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(4),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(120), // Subtle shadow
-              blurRadius: 4,
+              blurRadius: 5,
               offset: Offset(0, 4), // Floating effect, shadow below
             ),
           ],

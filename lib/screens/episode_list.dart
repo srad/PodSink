@@ -31,13 +31,13 @@ class _EpisodeListScreenState extends State<EpisodeListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.podcast.title)),
+      appBar: AppBar(title: Text(widget.podcast.artistName)),
       body: ListView.builder(
         itemCount: _episodes?.length ?? 0,
         itemBuilder: (context, index) {
           final episode = _episodes![index];
           return ListTile(
-            title: Text(episode.title),
+            title: Text(episode.trackName),
             subtitle: Text(episode.audioUrl),
             onTap:
                 () =>

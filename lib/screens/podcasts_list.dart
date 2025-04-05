@@ -1,11 +1,11 @@
-// podcast_list_screen.dart
 import 'package:confirm_dialog/confirm_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:podsink/services/podcast_service.dart';
 import 'package:podsink/widgets/app_drawer.dart';
 import 'package:podsink/models/podcast.dart';
 import 'package:podsink/services/db_service.dart';
-import 'package:podsink/services/update_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 class PodcastListScreen extends StatefulWidget {
   const PodcastListScreen({super.key});
@@ -32,52 +32,59 @@ class _PodcastListScreenState extends State<PodcastListScreen> {
 
   Future<void> _removePodcast(Podcast podcast) async {
     final dbService = DBService();
-    await dbService.destroyPodcast(podcast);
+    if (podcast.id != null) {
+      try {
+        await dbService.destroyPodcast(podcast.id!);
+        setState(() {
+          _podcasts = _podcasts?.where((element) => element.id != podcast.id!).toList() ?? [];
+        });
+      } catch (e) {
+        AlertDialog(title: Text("Error deleting podcast"), content: Text('$e'));
+      }
+    }
   }
 
   Future<void> _updatePodcast(Podcast podcast) async {
-    final updateService = UpdateService();
-    await updateService.updatePodcast(podcast);
+    final service = Provider.of<PodcastService>(context);
+    await service.updatePodcast(podcast);
     _loadPodcasts(); // Reload the list after updating
   }
 
   PreferredSizeWidget _appBar(BuildContext context) {
-    return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [Text('Podcasts'), Icon(Icons.podcasts)],
-      ),
-    );
+    return AppBar(title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Podcasts'), Icon(Icons.podcasts)]));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final podcast =
-              await Navigator.pushNamed(context, '/search') as Podcast?;
-          if (podcast != null) {
-            await _loadPodcasts();
-          }
-        },
-        tooltip: "Add podcast",
-        child: const Icon(Icons.search, color: Colors.white, size: 28),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        spacing: 15,
+        children: [
+          FloatingActionButton(
+            child: Icon(Icons.add, size: 28),
+            onPressed: () async {
+              final podcast = await Navigator.pushNamed(context, '/add') as Podcast?;
+              if (podcast != null) {
+                await _loadPodcasts();
+              }
+            },
+          ),
+          FloatingActionButton(
+            onPressed: () async {
+              final podcast = await Navigator.pushNamed(context, '/search') as Podcast?;
+              if (podcast != null) {
+                await _loadPodcasts();
+              }
+            },
+            tooltip: "Add podcast",
+            child: const Icon(Icons.search, size: 28),
+          ),
+        ],
       ),
       drawer: AppDrawer(),
       appBar: _appBar(context),
-      body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
-        child:
-            _podcasts != null && _podcasts!.isNotEmpty
-                ? _podcastList(context)
-                : Center(
-                  child: Text(
-                    "No Podcasts yet",
-                    style: TextStyle(fontSize: 24),
-                  ),
-                ),
-      ),
+      body: Container(padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0), child: _podcasts != null && _podcasts!.isNotEmpty ? _podcastList(context) : Center(child: Text("No Podcasts yet", style: TextStyle(fontSize: 24)))),
     );
   }
 
@@ -87,15 +94,12 @@ class _PodcastListScreenState extends State<PodcastListScreen> {
       itemBuilder: (context, index) {
         final podcast = _podcasts![index];
         return Dismissible(
-          confirmDismiss:
-              (direction) => confirm(context, title: Text("Delete?")),
+          confirmDismiss: (direction) => confirm(context, title: Text("Delete?")),
           // Step 1
           key: Key(_podcasts![index].id.toString()),
           onDismissed: (direction) async {
             await _removePodcast(podcast);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('dismissed')));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('dismissed')));
           },
           child: ListTile(
             leading: SizedBox(
@@ -109,16 +113,14 @@ class _PodcastListScreenState extends State<PodcastListScreen> {
                   imageBuilder:
                       (context, imageProvider) => Image(
                         image: imageProvider,
-                        fit:
-                            BoxFit
-                                .fill, // Ensures the image fills the space while maintaining aspect ratio
+                        fit: BoxFit.fill, // Ensures the image fills the space while maintaining aspect ratio
                       ),
                   placeholder: (context, url) => CircularProgressIndicator(),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
             ),
-            title: Text(podcast.title),
+            title: Text(podcast.artistName),
             subtitle: Text(podcast.feedUrl),
             trailing: IconButton(
               icon: Icon(Icons.more_vert),
@@ -132,11 +134,7 @@ class _PodcastListScreenState extends State<PodcastListScreen> {
               },
             ),
             onTap: () async {
-              await Navigator.pushNamed(
-                context,
-                '/episodes',
-                arguments: podcast,
-              );
+              await Navigator.pushNamed(context, '/episodes', arguments: podcast);
             },
           ),
         );

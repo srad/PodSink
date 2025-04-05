@@ -83,8 +83,7 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
               ],
             ),
             // if (_selectedEpisode != null) Divider(),
-            // if (_selectedEpisode != null)
-            //   if (_selectedEpisode != null) SimpleAudioPlayer(url: _selectedEpisode!.mediaUrl),
+            // if (_selectedEpisode != null) SimpleAudioPlayer(url: _selectedEpisode!.mediaUrl),
           ],
         ),
       ),
@@ -93,64 +92,66 @@ class _EpisodesSearchScreenState extends State<EpisodesSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Episodes')),
-      body: FutureBuilder<FeedPodcast>(
-        future: _podcastFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.episodes.isEmpty) {
-            return const Center(child: Text('No episodes found.'));
-          }
+    return FutureBuilder<FeedPodcast>(
+      future: _podcastFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.episodes.isEmpty) {
+          return const Center(child: Text('No episodes found.'));
+        }
 
-          final podcast = snapshot.data!;
+        final podcast = snapshot.data;
 
-          return Column(
-            children: [
-              _info(podcast),
-              Expanded(
-                child: ListView.separated(
-                  separatorBuilder: (context, index) => Divider(),
-                  itemCount: podcast.episodes.length,
-                  itemBuilder: (context, index) {
-                    final episode = podcast.episodes[index];
+        if (podcast == null || podcast.episodes.isEmpty) {
+          return Center(child: Text('No podcasts found'));
+        }
 
-                    return ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(6.0), // Rounded corners for the image
-                        child: CachedNetworkImage(placeholder: (context, url) => const SizedBox(width: 50, height: 50, child: Center(child: CircularProgressIndicator())),
-                            errorWidget: (context, url, error) => const Icon(Icons.broken_image_outlined, size: 50),
-                            imageUrl: episode.imageUrl ?? podcast.imageUrl,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover),
-                      ),
-                      title: Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(episode.pubDate, style: TextStyle(color: Colors.grey.shade600)),
-                            Text(episode.duration ?? "-")
-                          ]),
-                      onTap: () async {
-                        setState(() {
-                          _selectedEpisode = episode;
-                          _loadMedia(context, episode);
-                        });
-                        //Navigator.pushNamed(context, '/player', arguments: episode);
+        return Scaffold(
+            appBar: AppBar(title: Text(podcast.title)),
+            body: Column(
+                children: [
+                  _info(podcast),
+                  Expanded(
+                    child: ListView.separated(
+                      separatorBuilder: (context, index) => Divider(),
+                      itemCount: podcast.episodes.length,
+                      itemBuilder: (context, index) {
+                        final episode = podcast.episodes[index];
+
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(6.0), // Rounded corners for the image
+                            child: CachedNetworkImage(placeholder: (context, url) => const SizedBox(width: 50, height: 50, child: Center(child: CircularProgressIndicator())),
+                                errorWidget: (context, url, error) => const Icon(Icons.broken_image_outlined, size: 50),
+                                imageUrl: episode.imageUrl ?? podcast.imageUrl,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover),
+                          ),
+                          title: Text(episode.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                          subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(episode.pubDate, style: TextStyle(color: Colors.grey.shade600)),
+                                Text(episode.duration ?? "-")
+                              ]),
+                          onTap: () async {
+                            setState(() {
+                              _selectedEpisode = episode;
+                              _loadMedia(context, episode);
+                            });
+                            //Navigator.pushNamed(context, '/player', arguments: episode);
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+                    ),
+                  ),
+                ])
+        );
+      });
   }
 
   Widget _scrollBox(String text, double maxHeight) {

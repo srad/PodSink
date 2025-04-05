@@ -8,7 +8,7 @@ class DownloadService {
   Future<void> downloadPodcast(Episode episode) async {
     final url = Uri.parse(episode.audioUrl);
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/${episode.title}.mp3');
+    final file = File('${dir.path}/${episode.trackName}.mp3');
 
     if (!await file.exists()) {
       final response = await HttpClient()
@@ -24,7 +24,7 @@ class DownloadService {
 
   Future<File?> getDownloadedPodcast(Episode episode) async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/${episode.title}.mp3');
+    final file = File('${dir.path}/${episode.trackName}.mp3');
 
     return await file.exists() ? file : null;
   }

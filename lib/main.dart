@@ -6,6 +6,8 @@ import 'package:podsink/models/episode.dart';
 import 'package:podsink/models/podcast.dart';
 import 'package:podsink/my_audio_handler.dart';
 import 'package:podsink/screens/about.dart';
+import 'package:podsink/services/db_service.dart';
+import 'package:podsink/services/podcast_service.dart';
 import 'package:podsink/theme_provider.dart';
 import 'package:podsink/screens/add_podcast.dart';
 import 'package:podsink/screens/episode_list.dart';
@@ -13,6 +15,7 @@ import 'package:podsink/screens/podcast_search.dart';
 import 'package:podsink/screens/podcasts_list.dart';
 import 'package:podsink/screens/player.dart';
 import 'package:podsink/screens/settings.dart';
+import 'package:podsink/utils/podcast_feed_parser.dart';
 import 'package:podsink/widgets/floating_player.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +27,11 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<PodcastFeedParser>(create: (_) => PodcastFeedParser()),
+        Provider<DBService>(create: (_) => DBService()),
+        ProxyProvider2<DBService, PodcastFeedParser, PodcastService>(
+          update: (context, dbService, parser, previous) => PodcastService(dbService, parser),
+        ),
         Provider<AudioHandler>(
           create: (_) => MyAudioHandler(), // Replace MyAudioHandler with your implementation
         ),

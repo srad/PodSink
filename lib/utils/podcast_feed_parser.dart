@@ -8,8 +8,9 @@ class FeedPodcast {
   final String imageUrl;
   final String feedUrl;
   final List<FeedEpisode> episodes;
+  final String author;
 
-  FeedPodcast({required this.title, required this.description, required this.link, required this.imageUrl, required this.feedUrl, required this.episodes});
+  FeedPodcast({required this.title, required this.description, required this.link, required this.imageUrl, required this.feedUrl, required this.episodes, required this.author});
 }
 
 class FeedEpisode {
@@ -38,6 +39,7 @@ class PodcastFeedParser {
     final channelTitle = document.findAllElements('channel').firstOrNull?.findAllElements('title').firstOrNull?.innerText;
     final channelDescription = document.findAllElements('channel').firstOrNull?.findAllElements('description').firstOrNull?.innerText;
     final channelLink = document.findAllElements('channel').firstOrNull?.findAllElements('link').firstOrNull?.innerText;
+    final channelAuthor = document.findAllElements('channel').firstOrNull?.findAllElements('itunes:author').firstOrNull?.innerText;
     final channelImageUrl = document.findAllElements('channel').firstOrNull?.findAllElements('image').firstOrNull?.findAllElements('url').firstOrNull?.innerText;
     final feedUrl = url;
 
@@ -58,7 +60,7 @@ class PodcastFeedParser {
       episodes.add(FeedEpisode(title: episodeTitle ?? "Title", description: episodeDescription ?? "Description", mediaUrl: audioUrl, pubDate: pubDate ?? "no date", imageUrl: episodeImageUrl, duration: duration));
     }
 
-    return FeedPodcast(title: channelTitle ?? "Title missing", description: channelDescription ?? "Description missing", link: channelLink ?? "https://example.com", imageUrl: channelImageUrl ?? '', feedUrl: feedUrl, episodes: episodes);
+    return FeedPodcast(title: channelTitle ?? "Title missing", author: channelAuthor ?? "No author", description: channelDescription ?? "Description missing", link: channelLink ?? "https://example.com", imageUrl: channelImageUrl ?? '', feedUrl: feedUrl, episodes: episodes);
   }
 }
 
